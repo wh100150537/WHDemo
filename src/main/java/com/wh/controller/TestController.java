@@ -35,8 +35,6 @@ public class TestController{
                         @RequestParam(required = false) Integer c, @PathVariable int d){
         System.out.println("ss"+a+b+c+d);
         User user = userMapper.selectByPrimaryKey(31);
-        System.out.println(user);
-        System.out.println(getLocalIp(request));
         return user;
     }
 
