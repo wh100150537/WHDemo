@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wh.dao.UserMapper">
+  <resultMap id="BaseResultMap" type="com.wh.entity.User">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+    <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="login_name" jdbcType="VARCHAR" property="loginName" />
+    <result column="role_id" jdbcType="INTEGER" property="roleId" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="agent_id" jdbcType="INTEGER" property="agentId" />
+    <result column="login_time" jdbcType="TIMESTAMP" property="loginTime" />
+    <result column="login_ip" jdbcType="VARCHAR" property="loginIp" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="display_statistics" jdbcType="INTEGER" property="displayStatistics" />
+    <result column="is_hide_phone" jdbcType="INTEGER" property="isHidePhone" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+      id, gmt_create, gmt_modified, status, name, login_name, role_id, phone, agent_id,
+      login_time, login_ip, password, remark, display_statistics, is_hide_phone
+    </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+      select
+      <include refid="Base_Column_List" />
+      from user
+      where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    </mapper>
