@@ -2,23 +2,28 @@ package com.wh.controller;
 
 import com.wh.dao.UserMapper;
 import com.wh.entity.User;
+import com.wh.utils.lm.HttpClient;
+import com.wh.utils.lm.MDUtil;
+import com.wh.utils.lm.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
+
 
 /**
  * Created by wh on 2017/10/26.
@@ -26,8 +31,14 @@ import java.util.UUID;
 @RestController
 public class TestController{
 
-    @Resource
+
+    public static HttpClient httpClient = new HttpClient();
+    public static final String apiUrl = "https://t.limuzhengxin.cn/api/gateway";
+
+            @Resource
     UserMapper userMapper;
+
+
 
     @GetMapping("/test/{d}")
     @ApiOperation(value = "测试")
@@ -36,6 +47,29 @@ public class TestController{
         System.out.println("ss"+a+b+c+d);
         User user = userMapper.selectByPrimaryKey(31);
         return user;
+    }
+
+    @PostMapping("/notify/lm")
+    @ApiOperation("立木回调")
+    public String lm(String uid,String bizType,String code, String msg, String token) {
+        System.out.println("立木回调==/notify/lm");
+        System.out.println("uid=" + uid);
+        System.out.println("bizType=" + bizType);
+        System.out.println("code=" + code);
+        System.out.println("msg=" + msg);
+        System.out.println("token=" + token);
+        List<BasicNameValuePair> reqParam = new ArrayList<BasicNameValuePair>();
+        reqParam.add(new BasicNameValuePair("method", "api.common.getResult"));
+        reqParam.add(new BasicNameValuePair("apiKey", "0848901135526939"));
+        reqParam.add(new BasicNameValuePair("version", "1.2.0"));
+        reqParam.add(new BasicNameValuePair("token", token));
+        reqParam.add(new BasicNameValuePair("bizType", bizType));
+        reqParam.add(new BasicNameValuePair("sign", getSign(reqParam)));//请求参数签名
+        if ("0000".equals(code)) {
+            String json = httpClient.doPost(apiUrl, reqParam);
+            System.out.println(json);
+        }
+        return "success";
     }
 
 
@@ -79,15 +113,7 @@ public class TestController{
 
 
 
-    public static void main(String[] args) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.set(Calendar.HOUR_OF_DAY,23);
-        calendar.set(Calendar.MINUTE,59);
-        calendar.set(Calendar.SECOND,59);
-        calendar.add(Calendar.DAY_OF_YEAR,1);
-        System.out.println(calendar.getTime());
-    }
+
 
     public static String getLocalIp(HttpServletRequest request) {
         String remoteAddr = request.getRemoteAddr();
@@ -115,4 +141,68 @@ public class TestController{
         }
         return ip;
     }
+
+    /**
+     * 签名转化
+     *
+     * @param reqParam
+     * @return
+     */
+    public String getSign(List<BasicNameValuePair> reqParam) {
+
+        StringBuffer sbb = new StringBuffer();
+        int index = 1;
+        for (BasicNameValuePair nameValuePair : reqParam) {
+            sbb.append(nameValuePair.getName() + "=" + nameValuePair.getValue());
+            if (reqParam.size() != index) {
+                sbb.append("&");
+            }
+            index++;
+        }
+        String sign = sbb.toString();
+
+        Map<String, String> paramMap = new HashMap<String, String>();
+        String ret = "";
+        if (!StringUtils.isEmpty(sign)) {
+            String[] arr = sign.split("&");
+            for (int i = 0; i < arr.length; i++) {
+                String tmp = arr[i];
+                if (-1 != tmp.indexOf("=")) {
+                    paramMap.put(tmp.substring(0, tmp.indexOf("=")), tmp.substring(tmp.indexOf("=") + 1, tmp.length()));
+                }
+
+            }
+        }
+        List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>(paramMap.entrySet());
+        Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
+            public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
+                int ret = 0;
+                ret = o1.getKey().compareTo(o2.getKey());
+                if (ret > 0) {
+                    ret = 1;
+                } else {
+                    ret = -1;
+                }
+                return ret;
+            }
+        });
+
+        StringBuilder sbTmp = new StringBuilder();
+        for (Map.Entry<String, String> mapping : list) {
+            if (!"sign".equals(mapping.getKey())) {
+                sbTmp.append(mapping.getKey()).append("=").append(mapping.getValue()).append("&");
+            }
+        }
+        sbTmp.setLength(sbTmp.lastIndexOf("&"));
+        sbTmp.append("Q3jW5mYt3tpN8EPAk2WfN9W3SH5WWPMQ");
+        ret = MDUtil.SHA1(sbTmp.toString());
+
+        //System.out.println(sb.toString());
+        return ret;
+    }
+
+
+
+
+
 }
