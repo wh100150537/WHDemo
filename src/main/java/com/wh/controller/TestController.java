@@ -1,15 +1,22 @@
 package com.wh.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.wh.dao.UserMapper;
 import com.wh.entity.User;
 import com.wh.utils.lm.HttpClient;
 import com.wh.utils.lm.MDUtil;
 import com.wh.utils.lm.StringUtils;
+import com.wh.utils.token.AESUtil;
+import com.wh.utils.token.LoginUser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.http.HttpResponse;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -31,11 +38,12 @@ import java.util.*;
 @RestController
 public class TestController{
 
+    private static Logger logger = LoggerFactory.getLogger(TestController.class);
 
     public static HttpClient httpClient = new HttpClient();
     public static final String apiUrl = "https://t.limuzhengxin.cn/api/gateway";
 
-            @Resource
+    @Resource
     UserMapper userMapper;
 
 
@@ -45,6 +53,9 @@ public class TestController{
     public User testURL(HttpServletRequest request, @RequestParam String a, @RequestParam String b,
                         @RequestParam(required = false) Integer c, @PathVariable int d){
         System.out.println("ss"+a+b+c+d);
+        logger.info(a);
+        logger.warn(b);
+        logger.error(c+"");
         User user = userMapper.selectByPrimaryKey(31);
         return user;
     }
@@ -80,41 +91,64 @@ public class TestController{
 
     @PostMapping("/upload")
     @ApiOperation(value = "图片上传")
-    public void upload(MultipartFile file){
+    public String upload(MultipartFile file){
         String fileName = "";
         try{
             String originaFileName = file.getOriginalFilename();
-            System.out.println(originaFileName);
+            System.out.println("原图片名"+originaFileName);
             InputStream in = file.getInputStream();
             fileName = UUID.randomUUID()+"."+file.getOriginalFilename().split("\\.")[1];
-            System.out.println(fileName);
+            System.out.println("新生成图片名"+fileName);
             String dir = uploadDir + DateFormatUtils.format(new Date(),"yyyyMMdd");
-            System.out.println(dir);
+            System.out.println("一天一个文件夹"+dir);
             File dirFile = new File(dir);
             if(!dirFile.exists()){
                 if(dirFile.mkdir())
                     System.out.println("创建文件夹成功");
-                else
+                else{
                     System.out.println("创建文件夹失败");
+                    return "失败";
+                }
+
+
             }
 
-            String fileRealPath = uploadUrl + dir + "/" + fileName;
-            System.out.println(fileRealPath);
+            String fileRealPath = dir + "/" + fileName;
+            System.out.println("图片路径"+fileRealPath);
             File file1 = new File(fileRealPath);
             if (!file1.exists()){
                 file1.createNewFile();
             }
             FileUtils.copyInputStreamToFile(in,file1);
-            System.out.println("上传成功");
+            System.out.println("图片上传成功");
+            return "成功";
         }catch (Exception e){
             e.printStackTrace();
+            return "失败";
         }
+    }
+
+    @PostMapping("/login")
+    @ApiOperation("登陆")
+    public Map login(
+            @ApiParam("号码") @RequestParam String phone,
+            @ApiParam("密码") @RequestParam String password
+    ){
+        LoginUser loginUser = new LoginUser();
+        loginUser.setId(1);
+        loginUser.setTime(new Date().getTime());
+        Map response = new HashMap();
+        response.put("id",1);
+        response.put("token", AESUtil.encrypt(JSON.toJSONString(loginUser)));
+
+
+        return response;
     }
 
 
 
 
-
+    //获取ip
     public static String getLocalIp(HttpServletRequest request) {
         String remoteAddr = request.getRemoteAddr();
         String forwarded = request.getHeader("X-Forwarded-For");
