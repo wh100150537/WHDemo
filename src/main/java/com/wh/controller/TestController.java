@@ -235,6 +235,11 @@ public class TestController{
         return ret;
     }
 
+    @RequestMapping("/hahei")
+    public String hahei(){
+        return "hahei";
+    }
+
 
 
 
