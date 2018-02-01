@@ -43,8 +43,7 @@ public class TestController{
     public static HttpClient httpClient = new HttpClient();
     public static final String apiUrl = "https://t.limuzhengxin.cn/api/gateway";
 
-    //haha
-    //whwhwh
+
 
     @Resource
     UserMapper userMapper;
