@@ -134,7 +134,7 @@
         <appender-ref ref="FILEERROR"/>
         <appender-ref ref="FILEWARN"/>
         <appender-ref ref="FILEINFO"/>
-        <appender-ref ref="FILEOUT"/>
+
         <!-- 生产环境将请stdout,testfile去掉 -->
         <appender-ref ref="STDOUT"/>
     </root>

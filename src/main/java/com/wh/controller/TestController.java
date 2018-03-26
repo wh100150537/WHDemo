@@ -3,6 +3,7 @@ package com.wh.controller;
 import com.alibaba.fastjson.JSON;
 import com.wh.dao.UserMapper;
 import com.wh.entity.User;
+import com.wh.mq.Sender;
 import com.wh.utils.lm.HttpClient;
 import com.wh.utils.lm.MDUtil;
 import com.wh.utils.lm.StringUtils;
@@ -48,7 +49,8 @@ public class TestController{
     @Resource
     UserMapper userMapper;
 
-
+    @Autowired
+    private Sender sender;
 
     @GetMapping("/test/{d}")
     @ApiOperation(value = "测试")
@@ -146,6 +148,14 @@ public class TestController{
 
         return response;
     }
+
+
+    @GetMapping("/mq")
+    @ApiOperation("mq hello")
+    public void mq(){
+        sender.send();
+    }
+
 
 
 

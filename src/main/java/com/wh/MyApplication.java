@@ -1,6 +1,8 @@
 package com.wh;
 
+import com.wh.mq.Sender;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -11,10 +13,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @SpringBootApplication
 @MapperScan("com.wh.dao")
 public class MyApplication extends WebMvcConfigurerAdapter {
+
+
     public static void main(String[] args) {
 
-
-        //////////////sssss
         SpringApplication.run(MyApplication.class,args);
+
+
+
     }
 }
