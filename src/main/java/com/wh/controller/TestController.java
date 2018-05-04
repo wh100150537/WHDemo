@@ -160,6 +160,8 @@ public class TestController{
 
 
 
+
+
     //获取ip
     public static String getLocalIp(HttpServletRequest request) {
         String remoteAddr = request.getRemoteAddr();
