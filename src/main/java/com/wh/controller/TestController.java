@@ -7,9 +7,6 @@ import com.wh.mq.Sender;
 import com.wh.utils.lm.HttpClient;
 import com.wh.utils.lm.MDUtil;
 import com.wh.utils.lm.StringUtils;
-import com.wh.utils.token.AESUtil;
-import com.wh.utils.token.LoginUser;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.FileUtils;
@@ -138,12 +135,12 @@ public class TestController{
             @ApiParam("号码") @RequestParam String phone,
             @ApiParam("密码") @RequestParam String password
     ){
-        LoginUser loginUser = new LoginUser();
-        loginUser.setId(1);
-        loginUser.setTime(new Date().getTime());
+//        LoginUser loginUser = new LoginUser();
+//        loginUser.setId(1);
+//        loginUser.setTime(new Date().getTime());
         Map response = new HashMap();
-        response.put("id",1);
-        response.put("token", AESUtil.encrypt(JSON.toJSONString(loginUser)));
+//        response.put("id",1);
+//        response.put("token", AESUtil.encrypt(JSON.toJSONString(loginUser)));
         //////////
 
         return response;
