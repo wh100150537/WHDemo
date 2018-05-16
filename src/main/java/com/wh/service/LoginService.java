@@ -1,12 +1,23 @@
 package com.wh.service;
 
+import com.wh.controller.TestController;
+import com.wh.dao.SxReceiverSenderMapper;
 import com.wh.domain.response.Response;
+import com.wh.entity.SxReceiverSender;
+import com.wh.entity.SxReceiverSenderExample;
 import com.wh.utils.http.HttpClientUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class LoginService {
+
+    private static Logger logger = LoggerFactory.getLogger(LoginService.class);
 
     private final String WX_LOGIN_URL = "https://api.weixin.qq.com/sns/jscode2session";
 
@@ -15,6 +26,9 @@ public class LoginService {
     private String appId;
     @Value("${mini.program.secret}")
     private String secret;
+
+    @Autowired
+    SxReceiverSenderMapper receiverSenderMapper;
 
 
     public Response WXLogin(String code){
@@ -27,6 +41,26 @@ public class LoginService {
                 .append("&grant_type=").append("authorization_code");
         String result = HttpClientUtil.get(urlBuilder.toString());
         return null;
+    }
+
+    public Response addReceiverSender(String name,String phone,String address,Integer type,Integer userId){
+        logger.info("name:{},phone:{},address:{},type:{},userId:{}",name,phone,address,type,userId);
+        SxReceiverSender receiverSender = new SxReceiverSender();
+        receiverSender.setName(name);
+        receiverSender.setPhone(phone);
+        receiverSender.setAddress(address);
+        receiverSender.setType(type);
+        receiverSender.setUserId(userId);
+        receiverSenderMapper.insertSelective(receiverSender);
+        return Response.SUCCESS("添加成功");
+    }
+
+    public Response getReceiverSender(Integer type,Integer userId){
+        logger.info("type:{},userId:{}",type,userId);
+        SxReceiverSenderExample example = new SxReceiverSenderExample();
+        example.or().andTypeEqualTo(type).andUserIdEqualTo(userId);
+        List<SxReceiverSender> receiverSenderList = receiverSenderMapper.selectByExample(example);
+        return Response.SUCCESS(receiverSenderList);
     }
 
 }
