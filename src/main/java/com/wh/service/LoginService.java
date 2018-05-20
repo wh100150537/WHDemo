@@ -39,7 +39,7 @@ public class LoginService {
 
 
     public Response WXLogin(String code){
-
+        logger.info("appId:{},secret:{}",appId,secret);
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(WX_LOGIN_URL)
                 .append("?appid=").append(appId)
@@ -47,19 +47,20 @@ public class LoginService {
                 .append("&js_code=").append(code)
                 .append("&grant_type=").append("authorization_code");
         String result = HttpClientUtil.get(urlBuilder.toString());
-        logger.info("微信登录信息：{}",result);
+        logger.info("微信登陆信息：{}",result);
         JSONObject info = JSON.parseObject(result);
-        if(info.get("errcode")==null){
+        if(info.getString("errcode")==null) {
             String openId = info.getString("openid");
             SxUser user = new SxUser();
             user.setOpenId(openId);
             Date date = new Date();
-            user.setLoginDate(date);
             user.setRegisterDate(date);
+            user.setLoginDate(date);
             userMapper.insertSelective(user);
+            logger.info("user:{}", JSON.toJSONString(user));
             return Response.SUCCESS(user);
         }
-        return Response.ERROR("微信登录失败");
+        return Response.ERROR("login error");
     }
 
     public Response addReceiverSender(String name,String phone,String province,String city,String area,String detailAddress,Integer type,Integer userId){
