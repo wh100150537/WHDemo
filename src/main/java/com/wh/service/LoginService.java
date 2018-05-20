@@ -2,10 +2,12 @@ package com.wh.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.wh.controller.TestController;
 import com.wh.dao.SxReceiverSenderMapper;
 import com.wh.dao.SxUserMapper;
 import com.wh.domain.response.Response;
+import com.wh.domain.response.ResponseData;
 import com.wh.entity.SxReceiverSender;
 import com.wh.entity.SxReceiverSenderExample;
 import com.wh.entity.SxUser;
@@ -69,9 +71,12 @@ public class LoginService {
         receiverSender.setName(name);
         receiverSender.setPhone(phone);
         receiverSender.setProvince(province);
+        receiverSender.setCity(city);
+        receiverSender.setArea(area);
         receiverSender.setDetailAddress(detailAddress);
         receiverSender.setType(type);
         receiverSender.setUserId(userId);
+        receiverSender.setCreateTime(new Date());
         receiverSenderMapper.insertSelective(receiverSender);
         return Response.SUCCESS("添加成功");
     }
@@ -81,7 +86,21 @@ public class LoginService {
         SxReceiverSenderExample example = new SxReceiverSenderExample();
         example.or().andTypeEqualTo(type).andUserIdEqualTo(userId);
         List<SxReceiverSender> receiverSenderList = receiverSenderMapper.selectByExample(example);
-        return Response.SUCCESS(receiverSenderList);
+        List<ResponseData> responseDataList = Lists.newArrayList();
+        for (SxReceiverSender receiverSender:receiverSenderList){
+            ResponseData responseData = new ResponseData();
+            responseData.setReceiverSenderId(receiverSender.getId());
+            responseData.setName(receiverSender.getName());
+            responseData.setPhone(receiverSender.getPhone());
+            responseData.setProvince(receiverSender.getProvince());
+            responseData.setCity(receiverSender.getCity());
+            responseData.setArea(receiverSender.getArea());
+            responseData.setDetailAddress(receiverSender.getDetailAddress());
+            responseData.setType(receiverSender.getType());
+
+            responseDataList.add(responseData);
+        }
+        return Response.SUCCESS(responseDataList);
     }
 
 }
