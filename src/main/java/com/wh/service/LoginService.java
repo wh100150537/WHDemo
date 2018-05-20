@@ -68,7 +68,8 @@ public class LoginService {
         SxReceiverSender receiverSender = new SxReceiverSender();
         receiverSender.setName(name);
         receiverSender.setPhone(phone);
-        receiverSender.setAddress(detailAddress);
+        receiverSender.setProvince(province);
+        receiverSender.setDetailAddress(detailAddress);
         receiverSender.setType(type);
         receiverSender.setUserId(userId);
         receiverSenderMapper.insertSelective(receiverSender);
