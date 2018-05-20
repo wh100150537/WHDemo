@@ -1,10 +1,14 @@
 package com.wh.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.wh.controller.TestController;
 import com.wh.dao.SxReceiverSenderMapper;
+import com.wh.dao.SxUserMapper;
 import com.wh.domain.response.Response;
 import com.wh.entity.SxReceiverSender;
 import com.wh.entity.SxReceiverSenderExample;
+import com.wh.entity.SxUser;
 import com.wh.utils.http.HttpClientUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -29,6 +34,8 @@ public class LoginService {
 
     @Autowired
     SxReceiverSenderMapper receiverSenderMapper;
+    @Autowired
+    SxUserMapper userMapper;
 
 
     public Response WXLogin(String code){
@@ -40,15 +47,27 @@ public class LoginService {
                 .append("&js_code=").append(code)
                 .append("&grant_type=").append("authorization_code");
         String result = HttpClientUtil.get(urlBuilder.toString());
-        return null;
+        logger.info("微信登录信息：{}",result);
+        JSONObject info = JSON.parseObject(result);
+        if(info.get("errcode")==null){
+            String openId = info.getString("openid");
+            SxUser user = new SxUser();
+            user.setOpenId(openId);
+            Date date = new Date();
+            user.setLoginDate(date);
+            user.setRegisterDate(date);
+            userMapper.insertSelective(user);
+            return Response.SUCCESS(user);
+        }
+        return Response.ERROR("微信登录失败");
     }
 
-    public Response addReceiverSender(String name,String phone,String address,Integer type,Integer userId){
-        logger.info("name:{},phone:{},address:{},type:{},userId:{}",name,phone,address,type,userId);
+    public Response addReceiverSender(String name,String phone,String province,String city,String area,String detailAddress,Integer type,Integer userId){
+        logger.info("name:{},phone:{},address:{},type:{},userId:{}",name,phone,detailAddress,type,userId);
         SxReceiverSender receiverSender = new SxReceiverSender();
         receiverSender.setName(name);
         receiverSender.setPhone(phone);
-        receiverSender.setAddress(address);
+        receiverSender.setAddress(detailAddress);
         receiverSender.setType(type);
         receiverSender.setUserId(userId);
         receiverSenderMapper.insertSelective(receiverSender);

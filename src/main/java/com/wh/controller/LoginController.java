@@ -26,11 +26,14 @@ public class LoginController {
     public Response addReceiverSender(
             @ApiParam("姓名") @RequestParam String name,
             @ApiParam("电话") @RequestParam String phone,
-            @ApiParam("地址") @RequestParam String address,
+            @ApiParam("省") @RequestParam String province,
+            @ApiParam("市") @RequestParam String city,
+            @ApiParam("区") @RequestParam String area,
+            @ApiParam("详细地址") @RequestParam String detailAddress,
             @ApiParam("类型，1-发件，2-收件") @RequestParam Integer type,
             @ApiParam("用户id") @RequestParam Integer userId
     ){
-        return loginService.addReceiverSender(name,phone,address,type,userId);
+        return loginService.addReceiverSender(name,phone,province,city,area,detailAddress,type,userId);
     }
 
     @PostMapping("/get/receiver/sender")
