@@ -11,6 +11,7 @@ import com.wh.domain.response.ResponseData;
 import com.wh.entity.SxReceiverSender;
 import com.wh.entity.SxReceiverSenderExample;
 import com.wh.entity.SxUser;
+import com.wh.entity.SxUserExample;
 import com.wh.utils.http.HttpClientUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,13 @@ public class LoginService {
         JSONObject info = JSON.parseObject(result);
         if(info.getString("errcode")==null) {
             String openId = info.getString("openid");
+            SxUserExample example = new SxUserExample();
+            example.or().andOpenIdEqualTo(openId);
+            List<SxUser> users = userMapper.selectByExample(example);
+            if(users.size()>0){
+                return Response.SUCCESS(users.get(0));
+            }
+
             SxUser user = new SxUser();
             user.setOpenId(openId);
             Date date = new Date();
